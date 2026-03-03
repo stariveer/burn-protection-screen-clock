@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { ref, onMounted, onUnmounted } from "vue";
   import { useStorage } from "@vueuse/core";
   import ClockDisplay from "./components/ClockDisplay.vue";
   import ConfigPanel from "./components/ConfigPanel.vue";
@@ -19,20 +19,23 @@
   // 配置面板显隐
   const panelVisible = ref(false);
 
-  // 检测双击左上角（200×200px 热区）打开配置
+  // 检测双击左上角（100×100px 热区）打开配置
   let lastTapTime = 0;
   function handleScreenTap(e: MouseEvent | TouchEvent) {
     const x = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
     const y = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
 
-    // 仅响应左上角热区
-    if (x > 200 || y > 200) return;
+    // 面板已打开时不处理，避免点遮罩关闭后立即重新打开
+    if (panelVisible.value) return;
+    if (x > 100 || y > 100) return;
 
     const now = Date.now();
     if (now - lastTapTime < 400) {
       panelVisible.value = true;
+      lastTapTime = 0; // 重置，防止三击再次触发
+    } else {
+      lastTapTime = now;
     }
-    lastTapTime = now;
   }
 
   // 时间同步
@@ -43,6 +46,16 @@
 
   // 防烧屏位置调度
   const { position } = useBurnInProtect(clockRef, config);
+  // 禁止手机双指缩放和双击放大（兼容 iOS Safari 忽略 user-scalable=no 的情况）
+  function blockZoom(e: TouchEvent) {
+    if (e.touches.length > 1) e.preventDefault();
+  }
+  onMounted(() => {
+    document.addEventListener("touchmove", blockZoom, { passive: false });
+  });
+  onUnmounted(() => {
+    document.removeEventListener("touchmove", blockZoom);
+  });
 </script>
 
 <template>

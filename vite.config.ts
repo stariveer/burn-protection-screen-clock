@@ -36,7 +36,11 @@ export default defineConfig({
                 ],
             },
             workbox: {
-                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
+                // 新 SW 无需等待旧标签页关闭，立即激活
+                skipWaiting: true,
+                // 激活后立即接管所有已打开的页面
+                clientsClaim: true,
                 runtimeCaching: [
                     {
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
