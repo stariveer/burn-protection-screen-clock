@@ -55,12 +55,12 @@
             <div class="color-group">
               <button
                 v-for="c in [
+                  'random', // 随机色（首位默认）
                   'blue', // 蓝色
                   'purple', // 紫色
                   'green', // 绿色
                   'orange', // 橙色
                   'red', // 红色
-                  'random', // 随机色
                 ]"
                 :key="c"
                 :class="[
@@ -72,7 +72,7 @@
                 :style="c === 'random' ? {} : { background: colorMap[c] }"
                 @click="update('color', c)"
               >
-                <span v-if="c === 'random'">🎲</span>
+                <span v-if="c === 'random'">🌈</span>
               </button>
             </div>
           </label>
@@ -82,8 +82,8 @@
             <span>字体大小 ({{ props.modelValue.fontSize }} vmin)</span>
             <input
               type="range"
-              min="8"
-              max="40"
+              min="28"
+              max="48"
               step="1"
               :value="props.modelValue.fontSize"
               @input="
@@ -113,27 +113,30 @@
             </div>
           </label>
 
-          <!-- 显示秒数 -->
-          <label class="config-row toggle-row">
-            <span>显示秒数</span>
-            <button
-              :class="['toggle', props.modelValue.showSeconds && 'on']"
-              @click="update('showSeconds', !props.modelValue.showSeconds)"
-            >
-              <span class="toggle-knob" />
-            </button>
-          </label>
-
-          <!-- 显示日期 -->
-          <label class="config-row toggle-row">
-            <span>显示日期</span>
-            <button
-              :class="['toggle', props.modelValue.showDate && 'on']"
-              @click="update('showDate', !props.modelValue.showDate)"
-            >
-              <span class="toggle-knob" />
-            </button>
-          </label>
+          <!-- 显示内容：秒数 + 日期同行 -->
+          <div class="config-row toggle-row">
+            <span>显示内容</span>
+            <div class="toggle-pair">
+              <label class="toggle-label">
+                <span>秒数</span>
+                <button
+                  :class="['toggle', props.modelValue.showSeconds && 'on']"
+                  @click="update('showSeconds', !props.modelValue.showSeconds)"
+                >
+                  <span class="toggle-knob" />
+                </button>
+              </label>
+              <label class="toggle-label">
+                <span>日期</span>
+                <button
+                  :class="['toggle', props.modelValue.showDate && 'on']"
+                  @click="update('showDate', !props.modelValue.showDate)"
+                >
+                  <span class="toggle-knob" />
+                </button>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -262,13 +265,36 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
   .random-btn {
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-    color: #333;
+    /* 彩虹渐变，传达“每次都不一样”的视觉感 */
+    background: conic-gradient(
+      from 0deg,
+      #ff6b6b,
+      #ffd93d,
+      #6bcb77,
+      #4d96ff,
+      #c77dff,
+      #ff6b6b
+    );
   }
 
   input[type="range"] {
     width: 100%;
     accent-color: #00cfff;
+    cursor: pointer;
+  }
+
+  /* 显示内容行：秒数 + 日期同行布局 */
+  .toggle-pair {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
   }
 

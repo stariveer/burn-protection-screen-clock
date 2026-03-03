@@ -9,8 +9,8 @@
 
   // 持久化配置（localStorage）
   const config = useStorage<ClockConfig>("burn-clock-config", {
-    color: "blue",
-    fontSize: 18,
+    color: "random",
+    fontSize: 40,
     updateIntervalMs: 60_000,
     showSeconds: true,
     showDate: true,
