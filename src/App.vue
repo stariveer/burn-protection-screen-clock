@@ -19,7 +19,7 @@
   // 配置面板显隐
   const panelVisible = ref(false);
 
-  // 检测双击左上角（100×100px 热区）打开配置
+  // 检测双击绝对物理像素左上角（0,0）~（100,100）打开配置
   let lastTapTime = 0;
   function handleScreenTap(e: MouseEvent | TouchEvent) {
     const x = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
@@ -60,11 +60,7 @@
 
 <template>
   <!-- 全黑背景，防止 OLED 漏光 -->
-  <div
-    class="app-bg"
-    @click="handleScreenTap"
-    @touchstart.passive="handleScreenTap"
-  >
+  <div class="app-bg" @click="handleScreenTap">
     <!-- 时钟展示 -->
     <ClockDisplay
       ref="clockRef"
