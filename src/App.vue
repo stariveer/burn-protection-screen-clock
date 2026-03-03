@@ -26,7 +26,7 @@
     const y = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
 
     // 仅响应左上角热区
-    if (x > 80 || y > 80) return;
+    if (x > 200 || y > 200) return;
 
     const now = Date.now();
     if (now - lastTapTime < 400) {
@@ -89,6 +89,5 @@
     height: 100%;
     background: #000;
     position: relative;
-    cursor: none; /* 全屏时钟隐藏鼠标指针 */
   }
 </style>

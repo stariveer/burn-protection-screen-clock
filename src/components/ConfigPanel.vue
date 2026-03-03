@@ -42,7 +42,7 @@
     >
       <div class="config-panel">
         <div class="panel-header">
-          <h2>时钟配置</h2>
+          <h2>时钟配置 <span class="panel-hint">（双击左上角呼出）</span></h2>
           <button class="close-btn" @click="emit('update:visible', false)">
             ✕
           </button>
@@ -135,8 +135,6 @@
             </button>
           </label>
         </div>
-
-        <p class="hint">双击屏幕左上角可再次呼出</p>
       </div>
     </div>
   </Transition>
@@ -183,6 +181,12 @@
     font-weight: 600;
     color: #fff;
     margin: 0;
+  }
+  .panel-hint {
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.3);
+    vertical-align: middle;
   }
 
   .close-btn {
@@ -320,13 +324,6 @@
   }
   .toggle.on .toggle-knob {
     transform: translateX(18px);
-  }
-
-  .hint {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.25);
   }
 
   /* 弹入动画 */
