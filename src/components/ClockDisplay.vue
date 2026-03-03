@@ -85,15 +85,9 @@
       fontSize: `${props.config.fontSize}vmin`,
     }"
   >
-    <!-- 主行：左侧日期 + 右侧时钟 -->
+    <!-- 主行：左侧 HH:MM + 右侧辅助列 -->
     <div class="main-row">
-      <!-- 左侧日期块（当开启显示日期时） -->
-      <div v-if="props.config.showDate" class="date-block">
-        <span class="date-monthday">{{ props.timeInfo.monthDay }}</span>
-        <span class="date-weekday">{{ props.timeInfo.weekday }}</span>
-      </div>
-
-      <!-- 右侧时钟数字 -->
+      <!-- 左侧：仅时和分 -->
       <div class="clock-time">
         <span class="digit" :style="digitStyle(0, darkGradient)">{{
           props.timeInfo.hours[0]
@@ -110,8 +104,12 @@
         <span class="digit ol" :style="digitStyle(3, lightGradient)">{{
           props.timeInfo.minutes[1]
         }}</span>
+      </div>
 
-        <template v-if="props.config.showSeconds">
+      <!-- 右侧辅助列：顶部日期，底部秒数 -->
+      <div class="right-col">
+        <!-- 右上：秒数 -->
+        <div v-if="props.config.showSeconds" class="seconds-block">
           <span class="colon colon-sm">:</span>
           <span class="digit digit-sm" :style="digitStyle(4, darkGradient)">{{
             props.timeInfo.seconds[0]
@@ -121,7 +119,13 @@
             :style="digitStyle(5, lightGradient)"
             >{{ props.timeInfo.seconds[1] }}</span
           >
-        </template>
+        </div>
+
+        <!-- 右下：月日 + 星期 -->
+        <div v-if="props.config.showDate" class="date-block">
+          <span class="date-monthday">{{ props.timeInfo.monthDay }}</span>
+          <span class="date-weekday">{{ props.timeInfo.weekday }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -152,16 +156,24 @@
     overflow: visible;
   }
 
-  /* 左侧日期块 */
+  /* 右侧辅助列：撑满时钟高度，日期居顶，秒数居底 */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    align-self: stretch; /* 拉伸与 clock-time 同高 */
+    padding-left: 0.1em;
+    /* seconds-block 用 margin-top: auto 吸附底部 */
+  }
+
+  /* 日期块：右对齐，纵向排 */
   .date-block {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding-top: 0.05em;
-    margin-right: 0.12em;
-    line-height: 1.2;
-    gap: 0.05em;
+    align-items: flex-end;
+    gap: 0.03em;
+    line-height: 1;
+    margin: 0.04em -0.04em 0 0;
   }
 
   .date-monthday {
@@ -177,6 +189,15 @@
     font-family: "Gotham Rounded", sans-serif;
     color: rgba(180, 200, 220, 0.55);
     letter-spacing: 0.04em;
+  }
+
+  /* 秒数块：右对齐底部 */
+  .seconds-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: "Gotham Rounded", sans-serif;
+    line-height: 0.9;
   }
 
   .clock-time {
