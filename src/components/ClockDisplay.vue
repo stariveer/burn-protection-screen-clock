@@ -198,7 +198,7 @@
     flex-direction: row;
     align-items: center;
     font-family: "Gotham Rounded", sans-serif;
-    line-height: 0.9;
+    line-height: 0.85;
     padding: 0.03em 0.1em 0 0;
   }
 
@@ -207,7 +207,7 @@
     align-items: center;
     font-family: "Gotham Rounded", sans-serif;
     overflow: visible;
-    line-height: 0.9;
+    line-height: 0.85;
     /* 不加 padding，让 getBoundingClientRect 尺寸尽量贴合视觉内容 */
   }
 
@@ -244,7 +244,7 @@
   }
 
   .colon {
-    margin: 0 0 0 0.2em;
+    margin: 0 -0.2em 0 0.2em;
     color: rgba(220, 225, 230, 0.85);
     font-family: "Gotham Rounded", sans-serif;
     align-self: center;

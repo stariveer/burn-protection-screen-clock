@@ -43,6 +43,7 @@ src/
   - `fontSize`、`showSeconds`、`showDate` 变化后等 2 帧重新定位
   - `window resize` 后立即重定位（1 帧）
   - 切换频率时重新对齐到新间隔的边界
+- **Safe Area 避让：** 每次定位时读取 CSS 变量 `--sat/--sar/--sab/--sal`（映射自 `env(safe-area-inset-*)`），将可移动范围限定在安全区域内，横竖屏切换后灵动岛/刘海/Home Bar 区域自动更新
 
 ## 2. 高精度时间同步（useTimeSync）
 
@@ -83,7 +84,11 @@ src/
   - 面板已打开时跳过检测，防点遮罩关闭后立即重新打开
   - 成功触发后重置 `lastTapTime = 0`，防三击触发两次
 - **持久化：** `@vueuse/core` 的 `useStorage`，存 `localStorage["burn-clock-config"]`
-- **可配置项：** 颜色主题 / 字体大小滑块 / 防烧屏频率 / 显示秒数开关 / 显示日期开关
+- **可配置项：**
+  - 颜色主题：6 个色系按钮（random 🎲 首位，背景为彩虹 `conic-gradient`）
+  - 字体大小滑块：`28~48 vmin`
+  - 防烧屏频率：30s / 1分 / 2分 / 5分
+  - 显示内容：秒数 + 日期开关合并同一行
 - **弹窗适配：** `max-height: 90dvh` + 内容区 `overflow-y: auto`，支持手机横屏
 
 ## 6. 禁止手机缩放
@@ -126,8 +131,8 @@ VitePWA({
 
 ```ts
 {
-  color: 'blue',
-  fontSize: 18,          // vmin
+  color: 'random',   // 默认随机色（每次换位抽色）
+  fontSize: 40,      // vmin，范围 28~48
   updateIntervalMs: 60_000,
   showSeconds: true,
   showDate: true,

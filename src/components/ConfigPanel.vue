@@ -72,7 +72,7 @@
                 :style="c === 'random' ? {} : { background: colorMap[c] }"
                 @click="update('color', c)"
               >
-                <span v-if="c === 'random'">🌈</span>
+                <span v-if="c === 'random'">🎲</span>
               </button>
             </div>
           </label>
