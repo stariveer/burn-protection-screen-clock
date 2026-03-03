@@ -173,7 +173,8 @@
     align-items: flex-end;
     gap: 0.03em;
     line-height: 1;
-    margin: 0.04em 0 0;
+    margin: 0.01em 0 0;
+    padding-right: 0.03em;
   }
 
   .date-monthday {
@@ -198,7 +199,7 @@
     align-items: center;
     font-family: "Gotham Rounded", sans-serif;
     line-height: 0.9;
-    padding: 0 0.1em 0 0;
+    padding: 0.03em 0.1em 0 0;
   }
 
   .clock-time {
