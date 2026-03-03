@@ -44,7 +44,11 @@
     >
       <div class="config-panel">
         <div class="panel-header">
-          <h2>时钟配置 <span class="panel-hint">（双击左上角呼出）</span></h2>
+          <h2>
+            时钟配置
+            <span class="panel-version">v1.0.0</span>
+            <span class="panel-hint">（双击左上角呼出）</span>
+          </h2>
           <button class="close-btn" @click="emit('update:visible', false)">
             ✕
           </button>
@@ -189,11 +193,22 @@
     color: #fff;
     margin: 0;
   }
+  .panel-version {
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
   .panel-hint {
     font-size: 11px;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.3);
     vertical-align: middle;
+    margin-left: 4px;
   }
 
   .close-btn {
