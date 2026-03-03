@@ -11,4 +11,9 @@
 
 :root {
   color-scheme: dark;
+  /* 安全区域映射（灵动岛/刘海屏/Home Bar），供 JS 通过 getComputedStyle 读取 */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
 }

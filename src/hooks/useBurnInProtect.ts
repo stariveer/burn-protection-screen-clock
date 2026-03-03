@@ -35,13 +35,38 @@ export function useBurnInProtect(
         const vpW = window.innerWidth
         const vpH = window.innerHeight
 
-        const newPos = calcNonOverlapPosition(
-            prevBox.value,
+        // 读取安全区域（灵动岛/刘海/Home Bar），单位 px
+        const cs = getComputedStyle(document.documentElement)
+        const parse = (v: string) => Math.max(0, parseFloat(v) || 0)
+        const insetTop = parse(cs.getPropertyValue('--sat'))
+        const insetRight = parse(cs.getPropertyValue('--sar'))
+        const insetBottom = parse(cs.getPropertyValue('--sab'))
+        const insetLeft = parse(cs.getPropertyValue('--sal'))
+
+        // 可移动区域：剔除四边安全区域
+        const usableW = vpW - insetLeft - insetRight
+        const usableH = vpH - insetTop - insetBottom
+
+        // 将 prevBox 转换到「可移动坐标系」内（减去左/顶安全边距）
+        const prevBoxLocal = prevBox.value ? {
+            ...prevBox.value,
+            x: prevBox.value.x - insetLeft,
+            y: prevBox.value.y - insetTop,
+        } : null
+
+        const newPosLocal = calcNonOverlapPosition(
+            prevBoxLocal,
             rect.width,
             rect.height,
-            vpW,
-            vpH,
+            usableW,
+            usableH,
         )
+
+        // 转回视口坐标（加上左/顶安全边距作为原点偏移）
+        const newPos = {
+            x: newPosLocal.x + insetLeft,
+            y: newPosLocal.y + insetTop,
+        }
 
         prevBox.value = {
             x: newPos.x,

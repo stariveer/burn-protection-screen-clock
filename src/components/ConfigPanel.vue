@@ -235,6 +235,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    padding: 4px; /* 为 scale(1.1) + box-shadow 留出溢出空间 */
   }
 
   .color-preset {
