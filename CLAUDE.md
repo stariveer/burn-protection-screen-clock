@@ -136,6 +136,5 @@ VitePWA({
 
 # Known Limitations
 
-- 字体设置过大（> ~25 vmin）时，时钟占屏面积超过 50%，防烧屏效果退化为对角线跳转，中心区域始终被照亮
 - `overflow: visible` 的子元素旋转溢出不计入 `getBoundingClientRect`，存在像素级精度误差（可忽略）
 - iOS PWA 后台挂起时 SW 更新检测可能延迟，最坏情况需要下次从桌面图标打开才能生效
