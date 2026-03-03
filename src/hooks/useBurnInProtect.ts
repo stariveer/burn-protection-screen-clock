@@ -11,10 +11,8 @@ import { calcNonOverlapPosition } from '../utils/math'
  * 2. 调用 calcNonOverlapPosition 计算第一个合法坐标
  * 3. 按 config.updateIntervalMs 定时触发新一轮坐标计算
  * 4. 每次切换前记录当前 BoundingBox，作为下次计算的约束
- * 5. 监听 config 变化，动态重启定时器
- *
- * @param clockRef  时钟容器的模板引用（HTMLElement）
- * @param config    响应式的时钟配置
+ * 5. 监听 fontSize / showSeconds / showDate 变化，立即重新定位
+ * 6. 监听窗口 resize，自动适配新视口尺寸
  */
 export function useBurnInProtect(
     clockRef: Ref<HTMLElement | null>,
@@ -28,7 +26,6 @@ export function useBurnInProtect(
         const raw = clockRef.value
         if (!raw) return
 
-        // ref 可能指向 Vue 组件实例（有 $el），也可能是原生 DOM 元素
         const el: HTMLElement | undefined =
             raw instanceof HTMLElement ? raw : (raw as unknown as { $el: HTMLElement }).$el
         if (!el || !(el instanceof HTMLElement)) return
@@ -37,7 +34,6 @@ export function useBurnInProtect(
         const vpW = window.innerWidth
         const vpH = window.innerHeight
 
-        // 计算不与上次重叠的新坐标
         const newPos = calcNonOverlapPosition(
             prevBox.value,
             rect.width,
@@ -46,7 +42,6 @@ export function useBurnInProtect(
             vpH,
         )
 
-        // 记录本次 BoundingBox 供下次使用
         prevBox.value = {
             x: newPos.x,
             y: newPos.y,
@@ -57,10 +52,19 @@ export function useBurnInProtect(
         position.value = newPos
     }
 
+    /**
+     * 等待 n 个动画帧后执行
+     * 字体大小、显示选项变化后 DOM 需要至少 2 帧才能完成重排
+     */
+    function afterFrames(n: number, fn: () => void) {
+        if (n <= 0) { fn(); return }
+        requestAnimationFrame(() => afterFrames(n - 1, fn))
+    }
+
     function startTimer() {
         stopTimer()
-        // 等待一个渲染帧，确保 DOM 尺寸已稳定
-        requestAnimationFrame(() => {
+        afterFrames(2, () => {
+            prevBox.value = null
             updatePosition()
             timer = setInterval(updatePosition, config.value.updateIntervalMs)
         })
@@ -73,15 +77,40 @@ export function useBurnInProtect(
         }
     }
 
-    onMounted(startTimer)
-    onUnmounted(stopTimer)
+    // 视口大小变化时立即重新定位
+    function onResize() {
+        afterFrames(1, updatePosition)
+    }
 
-    // 配置变化时重置并重新调度（重置 prevBox 避免旧约束干扰）
+    onMounted(() => {
+        startTimer()
+        window.addEventListener('resize', onResize)
+    })
+
+    onUnmounted(() => {
+        stopTimer()
+        window.removeEventListener('resize', onResize)
+    })
+
+    // 防烧屏频率变化：重置 + 重新调度
     watch(
         () => config.value.updateIntervalMs,
+        startTimer,
+    )
+
+    // 字体大小或显示选项变化：等 DOM 更新后重新测量并立即重定位
+    // 不重启 timer（频率不变），只即刻重算一次位置确保不超出视口
+    watch(
+        () => [
+            config.value.fontSize,
+            config.value.showSeconds,
+            config.value.showDate,
+        ],
         () => {
-            prevBox.value = null
-            startTimer()
+            afterFrames(2, () => {
+                prevBox.value = null // 尺寸变了，旧约束无效
+                updatePosition()
+            })
         },
     )
 
