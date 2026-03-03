@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300&display=swap");
+@font-face {
+  font-family: "Gotham Rounded";
+  src: url("/assets/fonts/Gotham-Rounded-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
 
 :root {
   color-scheme: dark;
