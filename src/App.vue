@@ -9,7 +9,7 @@
 
   // 持久化配置（localStorage）
   const config = useStorage<ClockConfig>("burn-clock-config", {
-    color: "#ffffff",
+    color: "blue",
     fontSize: 18,
     updateIntervalMs: 60_000,
     showSeconds: true,
@@ -19,7 +19,7 @@
   // 配置面板显隐
   const panelVisible = ref(false);
 
-  // 检测双击左上角（80×80px 热区）打开配置
+  // 检测双击左上角（200×200px 热区）打开配置
   let lastTapTime = 0;
   function handleScreenTap(e: MouseEvent | TouchEvent) {
     const x = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;

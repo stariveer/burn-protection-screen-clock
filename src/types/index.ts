@@ -35,14 +35,3 @@ export interface TimeInfo {
     weekday: string
 }
 
-/** 防烧屏状态 */
-export interface BurnInState {
-    position: Position
-    prevBox: BoundingBox | null
-}
-
-/** 渐变色元组：{dark: 底层渐变 css, light: 顶层半透 css} */
-export interface GradientPair {
-    dark: string
-    light: string
-}

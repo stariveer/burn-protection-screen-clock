@@ -11,30 +11,4 @@
 
 :root {
   color-scheme: dark;
-
-  /* 色系定义 (CSS Variables) - 深色为底层，浅色为顶层半透明 */
-  --theme-blue-dark-start: #005ae6;
-  --theme-blue-dark-end: #003b99;
-  --theme-blue-light-start: #6fb5ff;
-  --theme-blue-light-end: #209aff;
-
-  --theme-purple-dark-start: #8e2de2;
-  --theme-purple-dark-end: #4a00e0;
-  --theme-purple-light-start: #d387ff;
-  --theme-purple-light-end: #9d4edd;
-
-  --theme-green-dark-start: #00b09b;
-  --theme-green-dark-end: #008060;
-  --theme-green-light-start: #5cffdb;
-  --theme-green-light-end: #00d4a1;
-
-  --theme-orange-dark-start: #ff512f;
-  --theme-orange-dark-end: #dd2476;
-  --theme-orange-light-start: #fca584;
-  --theme-orange-light-end: #fc75a0;
-
-  --theme-red-dark-start: #cb2d3e;
-  --theme-red-dark-end: #9e0e20;
-  --theme-red-light-start: #ff758c;
-  --theme-red-light-end: #ff3e5b;
 }
