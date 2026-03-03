@@ -25,8 +25,13 @@ export function useBurnInProtect(
     let timer: ReturnType<typeof setInterval> | null = null
 
     function updatePosition() {
-        const el = clockRef.value
-        if (!el) return
+        const raw = clockRef.value
+        if (!raw) return
+
+        // ref 可能指向 Vue 组件实例（有 $el），也可能是原生 DOM 元素
+        const el: HTMLElement | undefined =
+            raw instanceof HTMLElement ? raw : (raw as unknown as { $el: HTMLElement }).$el
+        if (!el || !(el instanceof HTMLElement)) return
 
         const rect = el.getBoundingClientRect()
         const vpW = window.innerWidth

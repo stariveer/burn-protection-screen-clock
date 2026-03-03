@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed } from "vue";
+  import { ref } from "vue";
   import { useStorage } from "@vueuse/core";
   import ClockDisplay from "./components/ClockDisplay.vue";
   import ConfigPanel from "./components/ConfigPanel.vue";
@@ -40,10 +40,9 @@
 
   // 时钟元素引用（交给防烧屏 Hook 测量尺寸）
   const clockRef = ref<HTMLElement | null>(null);
-  const configRef = computed(() => config);
 
   // 防烧屏位置调度
-  const { position } = useBurnInProtect(clockRef, configRef);
+  const { position } = useBurnInProtect(clockRef, config);
 </script>
 
 <template>
@@ -53,9 +52,6 @@
     @click="handleScreenTap"
     @touchstart.passive="handleScreenTap"
   >
-    <!-- 左上角提示点（极小的可见标记） -->
-    <div class="corner-hint" />
-
     <!-- 时钟展示 -->
     <ClockDisplay
       ref="clockRef"
@@ -94,17 +90,5 @@
     background: #000;
     position: relative;
     cursor: none; /* 全屏时钟隐藏鼠标指针 */
-  }
-
-  /* 左上角极小提示点，用于提示双击区域 */
-  .corner-hint {
-    position: fixed;
-    top: 8px;
-    left: 8px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    pointer-events: none;
   }
 </style>
