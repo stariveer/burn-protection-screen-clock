@@ -20,6 +20,8 @@
     green: { dark: ["#00b09b", "#008060"], light: ["#5cffdb", "#00d4a1"] },
     orange: { dark: ["#ff512f", "#dd2476"], light: ["#fca584", "#fc75a0"] },
     red: { dark: ["#cb2d3e", "#9e0e20"], light: ["#ff758c", "#ff3e5b"] },
+    pink: { dark: ["#ec4899", "#be185d"], light: ["#fbcfe8", "#f472b6"] },
+    cyan: { dark: ["#0891b2", "#155e75"], light: ["#a5f3fc", "#22d3ee"] },
   };
   const colorPool = Object.keys(colorThemes);
   const currentColor = ref("blue");
@@ -244,15 +246,16 @@
   }
 
   .colon {
-    margin: 0 -0.2em 0 0.2em;
+    margin: 0 -0.2em 0 0;
     color: rgba(220, 225, 230, 0.85);
     font-family: "Gotham Rounded", sans-serif;
     align-self: center;
     transform: translateY(-0.05em);
+    z-index: 3;
   }
 
   .colon-sm {
     font-size: 0.42em;
-    margin: 0 0 0 0.3em;
+    margin: 0 0 0 0.1em;
   }
 </style>

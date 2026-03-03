@@ -71,7 +71,7 @@ src/
 
 ## 4. 颜色系统
 
-色系名：`blue | purple | green | orange | red | random`
+色系名：`blue | purple | green | orange | red | pink | cyan | random`
 
 - 存储在 `config.color`（字符串色系名，非 CSS 颜色值）
 - `random` 模式：每次防烧屏换位时从色系池随机抽取
@@ -85,7 +85,7 @@ src/
   - 成功触发后重置 `lastTapTime = 0`，防三击触发两次
 - **持久化：** `@vueuse/core` 的 `useStorage`，存 `localStorage["burn-clock-config"]`
 - **可配置项：**
-  - 颜色主题：6 个色系按钮（random 🎲 首位，背景为彩虹 `conic-gradient`）
+  - 颜色主题：8 个色系按钮（random 🎲 首位，背景为彩虹 `conic-gradient`）
   - 字体大小滑块：`28~48 vmin`
   - 防烧屏频率：30s / 1分 / 2分 / 5分
   - 显示内容：秒数 + 日期开关合并同一行

@@ -30,6 +30,8 @@
     green: "linear-gradient(135deg, #5cffdb, #00d4a1)",
     orange: "linear-gradient(135deg, #fca584, #fc75a0)",
     red: "linear-gradient(135deg, #ff758c, #ff3e5b)",
+    pink: "linear-gradient(135deg, #fbcfe8, #f472b6)",
+    cyan: "linear-gradient(135deg, #a5f3fc, #22d3ee)",
   };
 </script>
 
@@ -61,6 +63,8 @@
                   'green', // 绿色
                   'orange', // 橙色
                   'red', // 红色
+                  'pink', // 粉色
+                  'cyan', // 青色
                 ]"
                 :key="c"
                 :class="[
