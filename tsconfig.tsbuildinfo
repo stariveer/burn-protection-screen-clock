@@ -1,0 +1,1 @@
+{"root":["./src/main.ts","./src/vite-env.d.ts","./src/hooks/useburninprotect.ts","./src/hooks/usetimesync.ts","./src/types/index.ts","./src/utils/math.ts","./src/app.vue","./src/components/clockdisplay.vue","./src/components/configpanel.vue"],"version":"5.7.3"}

@@ -154,6 +154,7 @@
     align-items: flex-start; /* 顶对齐 */
     gap: 0;
     overflow: visible;
+    margin: 0 0 0 -0.08em;
   }
 
   /* 右侧辅助列：撑满时钟高度，日期居顶，秒数居底 */
@@ -163,7 +164,6 @@
     align-items: flex-end;
     align-self: stretch; /* 拉伸与 clock-time 同高 */
     padding-left: 0.1em;
-    /* seconds-block 用 margin-top: auto 吸附底部 */
   }
 
   /* 日期块：右对齐，纵向排 */
@@ -173,7 +173,7 @@
     align-items: flex-end;
     gap: 0.03em;
     line-height: 1;
-    margin: 0.04em -0.04em 0 0;
+    margin: 0.04em 0 0;
   }
 
   .date-monthday {
@@ -198,6 +198,7 @@
     align-items: center;
     font-family: "Gotham Rounded", sans-serif;
     line-height: 0.9;
+    padding: 0 0.1em 0 0;
   }
 
   .clock-time {
