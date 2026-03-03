@@ -22,6 +22,15 @@
     { label: "2 分钟", value: 120_000 },
     { label: "5 分钟", value: 300_000 },
   ];
+
+  // 色卡预览颜色映射（与 ClockDisplay.vue 中的色系保持一致）
+  const colorMap: Record<string, string> = {
+    blue: "linear-gradient(135deg, #6fb5ff, #209aff)",
+    purple: "linear-gradient(135deg, #d387ff, #9d4edd)",
+    green: "linear-gradient(135deg, #5cffdb, #00d4a1)",
+    orange: "linear-gradient(135deg, #fca584, #fc75a0)",
+    red: "linear-gradient(135deg, #ff758c, #ff3e5b)",
+  };
 </script>
 
 <template>
@@ -40,30 +49,31 @@
         </div>
 
         <div class="panel-body">
-          <!-- 字体颜色 -->
+          <!-- 颜色主题 -->
           <label class="config-row">
-            <span>字体颜色</span>
+            <span>颜色主题</span>
             <div class="color-group">
-              <input
-                type="color"
-                :value="props.modelValue.color"
-                @input="
-                  update('color', ($event.target as HTMLInputElement).value)
-                "
-              />
               <button
                 v-for="c in [
-                  '#ffffff',
-                  '#00ff88',
-                  '#00cfff',
-                  '#ffaa00',
-                  '#ff6b6b',
+                  'blue', // 蓝色
+                  'purple', // 紫色
+                  'green', // 绿色
+                  'orange', // 橙色
+                  'red', // 红色
+                  'random', // 随机色
                 ]"
                 :key="c"
-                class="color-preset"
-                :style="{ background: c }"
+                :class="[
+                  'color-preset',
+                  props.modelValue.color === c && 'active',
+                  c === 'random' && 'random-btn',
+                ]"
+                :title="c === 'random' ? '随机渐变色' : c"
+                :style="c === 'random' ? {} : { background: colorMap[c] }"
                 @click="update('color', c)"
-              />
+              >
+                <span v-if="c === 'random'">🎲</span>
+              </button>
             </div>
           </label>
 
@@ -142,15 +152,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* 横屏小屏时允许整体滚动 */
+    overflow-y: auto;
+    padding: 16px 0;
   }
 
   .config-panel {
     background: rgba(20, 20, 20, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
-    padding: 28px;
+    padding: 20px;
     width: min(90vw, 380px);
     box-shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
+    /* 限制最大高度，超出时内部滚动 */
+    max-height: 90dvh;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
   }
 
   .panel-header {
@@ -186,6 +204,13 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    overflow-y: auto;
+    flex: 1;
+    /* 在 WebKit 上隐藏滚动条使其更美观 */
+    scrollbar-width: none;
+  }
+  .panel-body::-webkit-scrollbar {
+    display: none;
   }
 
   .config-row {
@@ -208,29 +233,32 @@
     align-items: center;
   }
 
-  input[type="color"] {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    cursor: pointer;
-    padding: 2px;
-    background: transparent;
-  }
-
   .color-preset {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
     transition:
       transform 0.15s,
       border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
   }
   .color-preset:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .color-preset.active {
     border-color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  .random-btn {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    color: #333;
   }
 
   input[type="range"] {

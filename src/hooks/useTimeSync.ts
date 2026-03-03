@@ -23,12 +23,8 @@ export function useTimeSync() {
             hours: pad(now.getHours()),
             minutes: pad(now.getMinutes()),
             seconds: pad(now.getSeconds()),
-            dateStr: now.toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'short',
-            }),
+            monthDay: now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' }),
+            weekday: now.toLocaleDateString('zh-CN', { weekday: 'short' }),
         }
     }
 

@@ -1,7 +1,7 @@
 /** 时钟显示配置 */
 export interface ClockConfig {
-    /** 字体颜色，支持任意 CSS 颜色值 */
-    color: string
+    /** 字体颜色，支持任意 CSS 颜色值，或 'random' 表示每次跳位随机使用内置颜色池 */
+    color: string | 'random'
     /** 字体大小，单位 vmin */
     fontSize: number
     /** 防烧屏位置更新频率，单位毫秒 */
@@ -29,11 +29,20 @@ export interface TimeInfo {
     hours: string
     minutes: string
     seconds: string
-    dateStr: string
+    /** 如：3月3日 */
+    monthDay: string
+    /** 如：周二 */
+    weekday: string
 }
 
 /** 防烧屏状态 */
 export interface BurnInState {
     position: Position
     prevBox: BoundingBox | null
+}
+
+/** 渐变色元组：{dark: 底层渐变 css, light: 顶层半透 css} */
+export interface GradientPair {
+    dark: string
+    light: string
 }

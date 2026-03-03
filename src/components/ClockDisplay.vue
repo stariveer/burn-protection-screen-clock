@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { ref, watch, computed } from "vue";
   import type { ClockConfig, Position, TimeInfo } from "../types";
 
   interface Props {
@@ -8,6 +9,72 @@
   }
 
   const props = defineProps<Props>();
+
+  /* ─── 色系定义 ─── */
+  const colorThemes: Record<
+    string,
+    { dark: [string, string]; light: [string, string] }
+  > = {
+    blue: { dark: ["#005ae6", "#003b99"], light: ["#6fb5ff", "#209aff"] },
+    purple: { dark: ["#8e2de2", "#4a00e0"], light: ["#d387ff", "#9d4edd"] },
+    green: { dark: ["#00b09b", "#008060"], light: ["#5cffdb", "#00d4a1"] },
+    orange: { dark: ["#ff512f", "#dd2476"], light: ["#fca584", "#fc75a0"] },
+    red: { dark: ["#cb2d3e", "#9e0e20"], light: ["#ff758c", "#ff3e5b"] },
+  };
+  const colorPool = Object.keys(colorThemes);
+  const currentColor = ref("blue");
+
+  watch(
+    () => [props.config.color, props.position] as const,
+    ([newColor]) => {
+      if (newColor === "random") {
+        currentColor.value =
+          colorPool[Math.floor(Math.random() * colorPool.length)];
+      } else {
+        currentColor.value = colorPool.includes(newColor) ? newColor : "blue";
+      }
+    },
+    { immediate: true },
+  );
+
+  const darkGradient = computed(() => {
+    const [s, e] = colorThemes[currentColor.value]?.dark ?? [
+      "#005ae6",
+      "#003b99",
+    ];
+    return `linear-gradient(180deg, ${s} 0%, ${e} 100%)`;
+  });
+  const lightGradient = computed(() => {
+    const [s, e] = colorThemes[currentColor.value]?.light ?? [
+      "#6fb5ff",
+      "#209aff",
+    ];
+    return `linear-gradient(135deg, ${s} 0%, ${e} 100%)`;
+  });
+
+  /* ─── 每个数字独立随机倾斜 ─── */
+  // 6 个槽：[h0, h1, m0, m1, s0, s1]
+  // 角度范围：-12° ~ +4°，整体向左倾（像斜体），但各自有差异
+  function randAngle() {
+    return Math.random() * 20 - 10; // -10 ~ +10 deg，随机左右倾
+  }
+
+  const angles = ref<number[]>([0, 0, 0, 0, 0, 0].map(randAngle));
+
+  // 每次防烧屏换位时重新随机（position 变化）
+  watch(
+    () => props.position,
+    () => {
+      angles.value = angles.value.map(randAngle);
+    },
+  );
+
+  function digitStyle(idx: number, gradient: string) {
+    return {
+      backgroundImage: gradient,
+      transform: `rotate(${angles.value[idx]}deg)`,
+    };
+  }
 </script>
 
 <template>
@@ -18,29 +85,44 @@
       fontSize: `${props.config.fontSize}vmin`,
     }"
   >
-    <!-- 主时间显示 -->
-    <div class="clock-time">
-      <span class="digit dark">{{ props.timeInfo.hours[0] }}</span>
-      <span class="digit light overlap">{{ props.timeInfo.hours[1] }}</span>
+    <!-- 主行：左侧日期 + 右侧时钟 -->
+    <div class="main-row">
+      <!-- 左侧日期块（当开启显示日期时） -->
+      <div v-if="props.config.showDate" class="date-block">
+        <span class="date-monthday">{{ props.timeInfo.monthDay }}</span>
+        <span class="date-weekday">{{ props.timeInfo.weekday }}</span>
+      </div>
 
-      <span class="clock-colon">:</span>
-
-      <span class="digit dark">{{ props.timeInfo.minutes[0] }}</span>
-      <span class="digit light overlap">{{ props.timeInfo.minutes[1] }}</span>
-
-      <template v-if="props.config.showSeconds">
-        <span class="clock-colon seconds-colon">:</span>
-        <span class="digit dark clock-seconds">{{
-          props.timeInfo.seconds[0]
+      <!-- 右侧时钟数字 -->
+      <div class="clock-time">
+        <span class="digit" :style="digitStyle(0, darkGradient)">{{
+          props.timeInfo.hours[0]
         }}</span>
-        <span class="digit light overlap clock-seconds">{{
-          props.timeInfo.seconds[1]
+        <span class="digit ol" :style="digitStyle(1, lightGradient)">{{
+          props.timeInfo.hours[1]
         }}</span>
-      </template>
-    </div>
-    <!-- 日期显示 -->
-    <div v-if="props.config.showDate" class="clock-date">
-      {{ props.timeInfo.dateStr }}
+
+        <span class="colon">:</span>
+
+        <span class="digit" :style="digitStyle(2, darkGradient)">{{
+          props.timeInfo.minutes[0]
+        }}</span>
+        <span class="digit ol" :style="digitStyle(3, lightGradient)">{{
+          props.timeInfo.minutes[1]
+        }}</span>
+
+        <template v-if="props.config.showSeconds">
+          <span class="colon colon-sm">:</span>
+          <span class="digit digit-sm" :style="digitStyle(4, darkGradient)">{{
+            props.timeInfo.seconds[0]
+          }}</span>
+          <span
+            class="digit digit-sm ol"
+            :style="digitStyle(5, lightGradient)"
+            >{{ props.timeInfo.seconds[1] }}</span
+          >
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -51,78 +133,103 @@
     top: 0;
     left: 0;
     display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    /* 使用 transition 让位置变化更流畅 */
+    flex-direction: row; /* 改为横向：左日期 + 右时钟 */
+    align-items: flex-start; /* 顶对齐 */
+    gap: 0; /* 日期和时钟的间距由 date-block margin 控制 */
     transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-    /* 关闭文字选中，防止点击触发歪曲 */
     user-select: none;
     -webkit-user-select: none;
-    /* 开启 GPU 合成层，防止屏幕撕裂 */
     will-change: transform;
     white-space: nowrap;
-    line-height: 1;
+    overflow: visible;
+  }
+
+  .main-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start; /* 顶对齐 */
+    gap: 0;
+    overflow: visible;
+  }
+
+  /* 左侧日期块 */
+  .date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 0.05em;
+    margin-right: 0.12em;
+    line-height: 1.2;
+    gap: 0.05em;
+  }
+
+  .date-monthday {
+    font-size: 0.18em;
+    font-family: "Gotham Rounded", sans-serif;
+    color: rgba(200, 215, 230, 0.75);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .date-weekday {
+    font-size: 0.16em;
+    font-family: "Gotham Rounded", sans-serif;
+    color: rgba(180, 200, 220, 0.55);
+    letter-spacing: 0.04em;
   }
 
   .clock-time {
     display: flex;
     align-items: center;
     font-family: "Gotham Rounded", sans-serif;
+    overflow: visible;
+    line-height: 0.9;
+    /* 不加 padding，让 getBoundingClientRect 尺寸尽量贴合视觉内容 */
   }
 
   .digit {
     display: inline-block;
+    /* 固定宽度：防止不同数字字符宽度不同导致容器抖动 */
+    width: 0.68em;
+    text-align: center;
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     font-variant-numeric: tabular-nums;
+    transform-origin: center bottom;
+    position: relative;
+    transition: transform 1s ease-in-out;
   }
 
-  /* 深蓝渐变 (底层) - 参考图的较深蓝色 */
-  .digit.dark {
-    background-image: linear-gradient(180deg, #005ae6 0%, #003b99 100%);
-    position: relative;
-    z-index: 10;
-  }
-
-  /* 浅蓝渐变 半透明 (顶层透叠) - 还原参考图的亮蓝与半透重叠感 */
-  .digit.light {
-    background-image: linear-gradient(135deg, #6fb5ff 0%, #209aff 100%);
-    position: relative;
-    z-index: 20;
+  /* 第二个数字叠压在第一个上 */
+  .digit.ol {
+    margin: 0 -0.2em;
+    z-index: 2;
     opacity: 0.88;
   }
 
-  .overlap {
-    margin-left: -0.22em; /* 这里控制数字互相重叠的深度 */
+  .digit-sm {
+    font-size: 0.42em;
+    /* 保持固定宽，与父级 .digit 的 0.62em 对应 */
+    width: 0.68em;
+    text-align: center;
   }
 
-  .clock-colon {
-    margin: 0 0.05em; /* 减小冒号的边距，贴紧数字 */
-    color: rgba(220, 225, 230, 0.9);
+  .digit-sm.ol {
+    margin-left: -0.15em;
+  }
+
+  .colon {
+    margin: 0 0 0 0.2em;
+    color: rgba(220, 225, 230, 0.85);
     font-family: "Gotham Rounded", sans-serif;
-    opacity: 0.9;
-    transform: translateY(-0.06em);
+    align-self: center;
+    transform: translateY(-0.05em);
   }
 
-  .seconds-colon {
-    font-size: 0.4em;
-    margin: 0 0.02em;
-  }
-
-  .clock-seconds {
-    font-size: 0.4em;
-  }
-
-  .clock-seconds.overlap {
-    margin-left: -0.18em;
-  }
-
-  .clock-date {
-    font-size: 0.22em;
-    letter-spacing: 0.08em;
-    opacity: 0.55;
-    font-family: "Gotham Rounded", sans-serif;
-    margin-top: 0.7em;
+  .colon-sm {
+    font-size: 0.42em;
+    margin: 0 0 0 0.3em;
   }
 </style>
