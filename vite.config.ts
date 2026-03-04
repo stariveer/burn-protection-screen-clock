@@ -2,10 +2,16 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// 原生 App 构建时（Capacitor）禁用 Service Worker
+// 使用：CAPACITOR=1 pnpm build
+const isCapacitor = process.env.CAPACITOR === '1'
+
 export default defineConfig({
     plugins: [
         vue(),
         VitePWA({
+            // Native 构建时禁用 SW，避免 WKWebView 兼容问题
+            disable: isCapacitor,
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
             manifest: {

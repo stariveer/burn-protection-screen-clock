@@ -6,13 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
+    "build:ios": "vue-tsc -b && CAPACITOR=1 vite build",
+    "sync:ios": "pnpm build:ios && cap sync ios",
+    "open:ios": "cap open ios",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/ios": "^8.1.0",
     "@vueuse/core": "^11.3.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.1.0",
+    "@types/node": "^25.3.3",
     "@vitejs/plugin-vue": "^5.2.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",
