@@ -8,7 +8,18 @@
     <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
     <img src="https://img.shields.io/badge/PWA-Ready-success?style=for-the-badge&logo=pwa" alt="PWA" />
   </p>
+
+  <p>
+    <video src="./docs/showcase.mp4" width="80%" autoplay loop muted controls></video>
+  </p>
+  <p>
+    <img src="./docs/668_1x_shots_so.png" width="40%" />
+    &nbsp;&nbsp;
+    <img src="./docs/789_1x_shots_so.png" width="40%" />
+  </p>
 </div>
+
+- [在线体验](https://clock.trainspott.in/)
 
 ## ✨ 核心特性
 
@@ -63,6 +74,13 @@ pnpm preview
 对于开发者，本项目采用了“低耦合、严生命周期管控”的设计理念。如果你希望深入了解背后的跳动调度器、碰撞检测几何算法等硬核落地方案：
 
 > 请参阅项目根目录下的 [**`CLAUDE.md`**](./CLAUDE.md)，内含详尽的模块流转架构剖析与技术约束说明。
+
+## 📖 开发记录
+
+如果你好奇这个时钟背后的全链路折腾过程、PWA 踩坑经历以及为什么要包一层原生 App，可以阅读我写的开发总结博客：
+
+- [上篇：给旧手机续命，用 Vue3 手搓一个防烧屏全屏时钟 PWA](./docs/blog.md)
+- [下篇：用 Capacitor 把 PWA 打包成原生 iOS App，彻底干掉 Home Indicator](./docs/blog2.md)
 
 ## 💡 食用建议
 
