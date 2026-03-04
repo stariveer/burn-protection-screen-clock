@@ -7,6 +7,8 @@
     <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
     <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
     <img src="https://img.shields.io/badge/PWA-Ready-success?style=for-the-badge&logo=pwa" alt="PWA" />
+    <img src="https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=Capacitor&logoColor=white" alt="Capacitor" />
+    <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white" alt="iOS" />
   </p>
 
   <p>
@@ -29,6 +31,8 @@
   内建毫秒对齐自修复节拍器。摒弃会产生宏任务漂移的粗放 `setInterval`，改用差值对齐系统 `Date.now() % 1000` 以抵消浏览器线程延迟，保证时间读秒与现实世界严丝合缝。
 - 📱 **原生级沉浸 PWA (Progressive Web App)**
   配合 ServiceWorker 做到无网离线执行与静默热更新！将网页“添加到主屏幕”后，可获得隐藏系统状态栏及浏览器地址栏的 100% 全屏沉浸式体验。
+- 🍏 **支持打包为 iOS 原生 App (Capacitor)**
+  内置 Capacitor 原生加壳配置与特定自动化打包脚本，通过调用深层 iOS 原生 API 彻底解决 PWA 固有的“底部白条无法主动隐藏”的烧屏隐患，并强制屏蔽自动息屏。
 - 📐 **灵动岛 / 刘海屏 / Home Bar 智能避让**
   自动读取 `env(safe-area-inset-*)` 数值，确保时钟始终在视觉安全区域内移动，横竖屏切换后实时更新，永不被硬件遮挡。
 - 🎨 **高级视觉质感与微交互**
