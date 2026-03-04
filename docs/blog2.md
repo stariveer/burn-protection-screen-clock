@@ -209,6 +209,45 @@ cd /tmp && zip -r ~/Desktop/BurnClock.ipa Payload/
 
 免费 Apple ID 最多只能同时侧载 **3 个** App，包括 AltStore 自身。如果已经装了 AltStore + 其他侧载 App（比如 YouTube），就没有多余的槽位了。这个不是技术问题，是 Apple 的策略限制，只能 3 选 2。
 
+### 坑 9：WebView 并没有铺满全屏（右侧和底部的白/黑边）
+
+把 WebView 背景色改成深红调试后，发现 WebView 容器确实铺满了屏幕，但是 PWA 的 HTML 内容却没有填满 WebView，右侧和底部露出了背景色。
+
+**原因**：在横屏模式 + `viewport-fit=cover`（延伸到刘海区）的情况下，CSS 的 `width: 100%` 往往只会撑满安全区域（Safe Area）的宽度，而不会覆盖刘海背后的整个物理屏幕区域。
+
+**解决**：放弃 `100%`，改用 `100vw` 和 `100vh` 结合 `position: fixed`：
+
+```css
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.app-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+}
+```
+
+这样就能强制越过边界，真正铺满整个物理屏幕。
+
+### 坑 10：iOS 把 App 识别为旧机型尺寸并降级运行（Letterboxing）
+
+即使改了 CSS，在某些大屏设备上周围还是有一圈无法消除的黑边或白边。
+
+**原因**：Xcode 项目默认的 `LaunchScreen.storyboard` 里的 View 尺寸固定在 375×667（iPhone 8），且 **没有设置自动拉伸**（`autoresizingMask` 为空）。iOS 启动应用时，如果判断启动屏不能适配当前物理屏幕，就会认为这是一个未适配新机型的老旧 App，强制在“兼容模式”的黑框（Letterbox）里运行它，导致 WebView 的真实可视区域变小。
+
+**解决**：修改 `ios/App/App/Base.lproj/LaunchScreen.storyboard`：
+
+1. 补上自动拉伸：`<autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>`
+2. 将背景色设为纯黑，避免启动瞬间闪白光。
+
 ## 最终的 AppDelegate 代码
 
 经过上面这些坑，最终的核心代码其实很简洁——一个 `swizzleHomeIndicatorAutoHidden()` 函数加一处 `setNeedsUpdate` 通知：
