@@ -46,7 +46,7 @@
         <div class="panel-header">
           <h2>
             时钟配置
-            <span class="panel-version">v1.0.0</span>
+            <span class="panel-version">v1.0.1</span>
             <span class="panel-hint">（双击左上角呼出）</span>
           </h2>
           <button class="close-btn" @click="emit('update:visible', false)">

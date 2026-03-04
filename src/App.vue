@@ -84,18 +84,33 @@
     padding: 0;
   }
 
-  html,
-  body,
+  /* 防止橡皮筋弹性滚动时露出白底 */
+  html {
+    background: #000 !important;
+    overscroll-behavior: none;
+    /* iOS 全屏高度修复 */
+    height: -webkit-fill-available;
+    min-height: 100dvh;
+  }
+
+  body {
+    background: #000;
+    overscroll-behavior: none;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+
   #app {
     width: 100%;
-    height: 100%;
-    overflow: hidden;
+    min-height: 100dvh;
     background: #000;
+    overflow: hidden;
   }
 
   .app-bg {
     width: 100%;
     height: 100%;
+    min-height: 100dvh;
     background: #000;
     position: relative;
   }
