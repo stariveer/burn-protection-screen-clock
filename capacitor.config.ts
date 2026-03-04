@@ -6,8 +6,8 @@ const config: CapacitorConfig = {
     webDir: 'dist',
     ios: {
         scheme: 'BurnClock',
-        // WKWebView 原生背景设为纯黑，消除白边
-        backgroundColor: '#000000',
+        // 调试用：深红色，确认 WebView 是否铺满（验证后改回 #000000）
+        backgroundColor: '#880000',
         // 关闭内置滚动弹性，避免与时钟内容冲突
         scrollEnabled: false,
         // 内容延伸到状态栏下方（全屏效果）

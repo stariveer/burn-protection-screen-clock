@@ -35,6 +35,7 @@ export function useBurnInProtect(
         const vpW = window.innerWidth
         const vpH = window.innerHeight
 
+
         // 读取安全区域（灵动岛/刘海/Home Bar），单位 px
         const cs = getComputedStyle(document.documentElement)
         const parse = (v: string) => Math.max(0, parseFloat(v) || 0)
