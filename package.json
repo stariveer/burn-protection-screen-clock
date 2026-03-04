@@ -9,6 +9,7 @@
     "build:ios": "vue-tsc -b && CAPACITOR=1 vite build",
     "sync:ios": "pnpm build:ios && cap sync ios",
     "open:ios": "cap open ios",
+    "package:ios": "bash scripts/package-ios.sh",
     "preview": "vite preview"
   },
   "dependencies": {

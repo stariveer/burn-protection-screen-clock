@@ -71,3 +71,60 @@ pnpm preview
 1. **系统常亮**：进入手机**「设置 -> 显示与亮度」**，将“自动息屏”或“休眠时间”更改为**「永不」**。
 2. **纯粹模式**：静音并开启免打扰，避免垃圾消息推送点亮通知弹框掩盖时钟组件。
 3. **添加桌面**：在 Chrome 或 Safari 浏览器中点击**“添加到主屏幕”**以享受纯沉浸时钟 UI。
+
+---
+
+## 📱 iOS 原生 App 打包指南（AltStore 侧载）
+
+将本项目打包为原生 iOS App 可解决 PWA 在 iOS 18 上 Home Indicator 永久显示的烧屏问题，原生 App 使用 `prefersHomeIndicatorAutoHidden` API 让底部小横条在无交互后自动淡出，并通过 `isIdleTimerDisabled` 防止屏幕自动锁屏。
+
+### 前置条件（仅首次）
+
+| 条件 | 说明 |
+|------|------|
+| **Xcode 16+** | App Store 免费下载 |
+| **Apple ID** | 普通 Apple ID，无需付费开发者账号 |
+| **AltStore / AltServer** | 手机和 Mac 均已安装 |
+| **iPhone 连 Mac** | USB 数据线，手机上点"信任此电脑" |
+
+### 一次性初始化（首次配置 Xcode 签名）
+
+```bash
+pnpm install        # 安装依赖
+pnpm open:ios       # 用 Xcode 打开项目
+```
+
+在 Xcode 中：
+1. 左侧点击 **App** 项目 → **Signing & Capabilities**
+2. Team 选择你的 Apple ID（Personal Team）→ 自动处理签名
+3. 顶部选择你的 iPhone → **`Cmd+R`** 首次构建安装
+
+### 日常更新流程
+
+```bash
+# 1. 修改代码后，重新构建 Web 并同步到 Xcode
+pnpm sync:ios
+
+# 2. Xcode 中 Cmd+R 重新构建（手机需连接）
+
+# 3. 打包 IPA（自动保存到桌面，带时间戳）
+pnpm package:ios
+```
+
+### 通过 AltStore 安装
+
+1. AirDrop 将桌面 `.ipa` 发送到 iPhone
+2. 手机上选择用 **AltStore** 打开 → 输入 Apple ID → 安装
+3. ⚠️ 免费 Apple ID 限 **3 个** App（含 AltStore 本身）
+
+### 自动续签
+
+AltStore 在手机和 Mac 同处一个 WiFi 时**自动续签**（7 天有效期），保持 Mac 菜单栏 AltServer 运行即可，无需手动操作。
+
+### 脚本速查
+
+| 命令 | 作用 |
+|------|------|
+| `pnpm sync:ios` | 构建 Web 并同步到 Xcode（禁用 Service Worker）|
+| `pnpm open:ios` | 用 Xcode 打开 iOS 项目 |
+| `pnpm package:ios` | 从最新 Xcode 构建打包 IPA 到桌面 |
