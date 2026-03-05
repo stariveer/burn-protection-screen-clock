@@ -55,12 +55,24 @@ export function useBurnInProtect(
             y: prevBox.value.y - insetTop,
         } : null
 
+        let customSafeZoneLocal: BoundingBox | null = null;
+        if (config.value.customSafeZone && config.value.customSafeZone.some(v => v !== 0)) {
+            const [sx, sy, ex, ey] = config.value.customSafeZone;
+            customSafeZoneLocal = {
+                x: sx - insetLeft,
+                y: sy - insetTop,
+                width: Math.max(0, ex - sx),
+                height: Math.max(0, ey - sy)
+            };
+        }
+
         const newPosLocal = calcNonOverlapPosition(
             prevBoxLocal,
             rect.width,
             rect.height,
             usableW,
             usableH,
+            customSafeZoneLocal
         )
 
         // 转回视口坐标（加上左/顶安全边距作为原点偏移）

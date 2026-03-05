@@ -16,6 +16,18 @@
     emit("update:modelValue", { ...props.modelValue, [key]: value });
   }
 
+  function updateCustomSafeZone(index: number, val: number) {
+    const newVal = isNaN(val) ? 0 : val;
+    const arr = props.modelValue.customSafeZone
+      ? [...props.modelValue.customSafeZone]
+      : [0, 0, 0, 0];
+    arr[index] = newVal;
+    emit("update:modelValue", {
+      ...props.modelValue,
+      customSafeZone: arr as [number, number, number, number],
+    });
+  }
+
   const intervalOptions = [
     { label: "30 秒", value: 30_000 },
     { label: "1 分钟", value: 60_000 },
@@ -143,6 +155,65 @@
                   <span class="toggle-knob" />
                 </button>
               </label>
+            </div>
+          </div>
+
+          <!-- 自定义安全区 -->
+          <div class="config-row">
+            <span>自定义避让区 (像素, 格式: 左上X, 左上Y, 右下X, 右下Y)</span>
+            <div class="safe-zone-inputs">
+              <input
+                type="number"
+                min="0"
+                step="1"
+                :value="props.modelValue.customSafeZone?.[0] ?? 0"
+                @input="
+                  updateCustomSafeZone(
+                    0,
+                    Number(($event.target as HTMLInputElement).value),
+                  )
+                "
+                placeholder="X1"
+              />
+              <input
+                type="number"
+                min="0"
+                step="1"
+                :value="props.modelValue.customSafeZone?.[1] ?? 0"
+                @input="
+                  updateCustomSafeZone(
+                    1,
+                    Number(($event.target as HTMLInputElement).value),
+                  )
+                "
+                placeholder="Y1"
+              />
+              <input
+                type="number"
+                min="0"
+                step="1"
+                :value="props.modelValue.customSafeZone?.[2] ?? 0"
+                @input="
+                  updateCustomSafeZone(
+                    2,
+                    Number(($event.target as HTMLInputElement).value),
+                  )
+                "
+                placeholder="X2"
+              />
+              <input
+                type="number"
+                min="0"
+                step="1"
+                :value="props.modelValue.customSafeZone?.[3] ?? 0"
+                @input="
+                  updateCustomSafeZone(
+                    3,
+                    Number(($event.target as HTMLInputElement).value),
+                  )
+                "
+                placeholder="Y2"
+              />
             </div>
           </div>
         </div>
@@ -370,6 +441,41 @@
   }
   .toggle.on .toggle-knob {
     transform: translateX(18px);
+  }
+
+  /* 自定义安全区输入框 */
+  .safe-zone-inputs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .safe-zone-inputs input {
+    width: 60px;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .safe-zone-inputs input:focus {
+    border-color: #00cfff;
+  }
+  .safe-zone-inputs input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  /* 隐藏 number input 的上下箭头 */
+  .safe-zone-inputs input::-webkit-outer-spin-button,
+  .safe-zone-inputs input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .safe-zone-inputs input[type="number"] {
+    -moz-appearance: textfield;
   }
 
   /* 弹入动画 */

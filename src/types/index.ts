@@ -10,6 +10,8 @@ export interface ClockConfig {
     showSeconds: boolean
     /** 是否显示日期 */
     showDate: boolean
+    /** 自定义安全区 [startX, startY, endX, endY]，原点为左上角 */
+    customSafeZone: [number, number, number, number]
 }
 
 /** 二维坐标位置 */

@@ -14,6 +14,7 @@
     updateIntervalMs: 60_000,
     showSeconds: true,
     showDate: true,
+    customSafeZone: [0, 0, 0, 0],
   });
 
   // 配置面板显隐

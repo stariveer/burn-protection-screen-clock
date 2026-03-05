@@ -33,18 +33,11 @@ export function calcNonOverlapPosition(
     elemH: number,
     vpW: number,
     vpH: number,
+    customSafeZoneLocal?: BoundingBox | null,
 ): Position {
     const MAX_RETRY = 50
     const maxX = Math.max(0, vpW - elemW)
     const maxY = Math.max(0, vpH - elemH)
-
-    // 首次没有上次位置，直接随机放置
-    if (!prevBox) {
-        return {
-            x: Math.floor(Math.random() * maxX),
-            y: Math.floor(Math.random() * maxY),
-        }
-    }
 
     // 尝试随机生成不重叠的坐标
     for (let i = 0; i < MAX_RETRY; i++) {
@@ -52,15 +45,18 @@ export function calcNonOverlapPosition(
         const y = Math.floor(Math.random() * maxY)
         const candidate: BoundingBox = { x, y, width: elemW, height: elemH }
 
-        if (!isOverlapping(candidate, prevBox)) {
+        const overPrev = prevBox ? isOverlapping(candidate, prevBox) : false
+        const overCustom = customSafeZoneLocal ? isOverlapping(candidate, customSafeZoneLocal) : false
+
+        if (!overPrev && !overCustom) {
             return { x, y }
         }
     }
 
     // 超出重试次数：强制跳到对角线安全区
     // 判断上次位置在视口的哪侧，新位置去对侧
-    const prevCenterX = prevBox.x + prevBox.width / 2
-    const prevCenterY = prevBox.y + prevBox.height / 2
+    const prevCenterX = prevBox ? (prevBox.x + prevBox.width / 2) : (vpW / 2)
+    const prevCenterY = prevBox ? (prevBox.y + prevBox.height / 2) : (vpH / 2)
 
     const goRight = prevCenterX < vpW / 2
     const goDown = prevCenterY < vpH / 2
