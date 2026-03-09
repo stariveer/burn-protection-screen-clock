@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { reactive, onMounted, onUnmounted } from 'vue'
 import type { TimeInfo } from '../types'
 
 /**
@@ -12,24 +12,36 @@ import type { TimeInfo } from '../types'
  *   若误差 > 50ms 则重新对齐，保证长时间运行不漂移
  */
 export function useTimeSync() {
-    const timeInfo = ref<TimeInfo>(getTimeInfo())
+    const defaultTimeInfo = (): TimeInfo => ({
+        hours: '00',
+        minutes: '00',
+        seconds: '00',
+        monthDay: '',
+        weekday: ''
+    })
+    const timeInfo = reactive<TimeInfo>(defaultTimeInfo())
+    
     let alignTimeout: ReturnType<typeof setTimeout> | null = null
     let tickInterval: ReturnType<typeof setInterval> | null = null
-
-    function getTimeInfo(): TimeInfo {
-        const now = new Date()
-        const pad = (n: number) => String(n).padStart(2, '0')
-        return {
-            hours: pad(now.getHours()),
-            minutes: pad(now.getMinutes()),
-            seconds: pad(now.getSeconds()),
-            monthDay: now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' }),
-            weekday: now.toLocaleDateString('zh-CN', { weekday: 'short' }),
-        }
-    }
+    let lastDay = -1 // 记录上一次的日期日份，用于性能优化，不频繁触发 toLocaleDateString
 
     function tick() {
-        timeInfo.value = getTimeInfo()
+        const now = new Date()
+        const s = now.getSeconds()
+        const m = now.getMinutes()
+        const h = now.getHours()
+        const d = now.getDate()
+        
+        // 性能优化：仅更新变化的值，避免 Vue 产生对象重造引发的深绘制
+        timeInfo.seconds = s < 10 ? '0' + s : '' + s
+        timeInfo.minutes = m < 10 ? '0' + m : '' + m
+        timeInfo.hours = h < 10 ? '0' + h : '' + h
+
+        if (d !== lastDay) {
+            lastDay = d
+            timeInfo.monthDay = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })
+            timeInfo.weekday = now.toLocaleDateString('zh-CN', { weekday: 'short' })
+        }
     }
 
     function alignToSecondBoundary() {

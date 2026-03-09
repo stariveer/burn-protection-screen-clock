@@ -71,12 +71,21 @@
     },
   );
 
-  function digitStyle(idx: number, gradient: string) {
-    return {
-      backgroundImage: gradient,
-      transform: `rotate(${angles.value[idx]}deg)`,
-    };
-  }
+  // 性能优化：将 style 缓存在 computed 中，避免 Vue 每秒由于 timeInfo 的更改重新在 template 中调用方法生成大量新字面量对象
+  const digitStyles = computed(() => {
+    const dark = darkGradient.value;
+    const light = lightGradient.value;
+    const ang = angles.value;
+    
+    return [
+      { backgroundImage: dark, transform: `rotate(${ang[0]}deg)` }, // 0: hh[0]
+      { backgroundImage: light, transform: `rotate(${ang[1]}deg)` }, // 1: hh[1]
+      { backgroundImage: dark, transform: `rotate(${ang[2]}deg)` }, // 2: mm[0]
+      { backgroundImage: light, transform: `rotate(${ang[3]}deg)` }, // 3: mm[1]
+      { backgroundImage: dark, transform: `rotate(${ang[4]}deg)` }, // 4: ss[0]
+      { backgroundImage: light, transform: `rotate(${ang[5]}deg)` }, // 5: ss[1]
+    ];
+  });
 </script>
 
 <template>
@@ -91,19 +100,19 @@
     <div class="main-row">
       <!-- 左侧：仅时和分 -->
       <div class="clock-time">
-        <span class="digit" :style="digitStyle(0, darkGradient)">{{
+        <span class="digit" :style="digitStyles[0]">{{
           props.timeInfo.hours[0]
         }}</span>
-        <span class="digit ol" :style="digitStyle(1, lightGradient)">{{
+        <span class="digit ol" :style="digitStyles[1]">{{
           props.timeInfo.hours[1]
         }}</span>
 
         <span class="colon">:</span>
 
-        <span class="digit" :style="digitStyle(2, darkGradient)">{{
+        <span class="digit" :style="digitStyles[2]">{{
           props.timeInfo.minutes[0]
         }}</span>
-        <span class="digit ol" :style="digitStyle(3, lightGradient)">{{
+        <span class="digit ol" :style="digitStyles[3]">{{
           props.timeInfo.minutes[1]
         }}</span>
       </div>
@@ -113,12 +122,12 @@
         <!-- 右上：秒数 -->
         <div v-if="props.config.showSeconds" class="seconds-block">
           <span class="colon colon-sm">:</span>
-          <span class="digit digit-sm" :style="digitStyle(4, darkGradient)">{{
+          <span class="digit digit-sm" :style="digitStyles[4]">{{
             props.timeInfo.seconds[0]
           }}</span>
           <span
             class="digit digit-sm ol"
-            :style="digitStyle(5, lightGradient)"
+            :style="digitStyles[5]"
             >{{ props.timeInfo.seconds[1] }}</span
           >
         </div>
