@@ -20,7 +20,6 @@ export function useBurnInProtect(
 ) {
     const position = ref<Position>({ x: 0, y: 0 })
     const prevBox = ref<BoundingBox | null>(null)
-    let timer: ReturnType<typeof setInterval> | null = null
     let alignTimeout: ReturnType<typeof setTimeout> | null = null
 
     function updatePosition() {
@@ -100,8 +99,19 @@ export function useBurnInProtect(
     }
 
     function stopTimer() {
-        if (timer) { clearInterval(timer); timer = null }
         if (alignTimeout) { clearTimeout(alignTimeout); alignTimeout = null }
+    }
+
+    function scheduleNext() {
+        if (alignTimeout) { clearTimeout(alignTimeout); alignTimeout = null }
+        
+        const interval = config.value.updateIntervalMs
+        const msToNextBoundary = interval - (Date.now() % interval)
+
+        alignTimeout = setTimeout(() => {
+            updatePosition()
+            scheduleNext()
+        }, msToNextBoundary)
     }
 
     function startTimer() {
@@ -109,17 +119,7 @@ export function useBurnInProtect(
         afterFrames(2, () => {
             prevBox.value = null
             updatePosition()
-
-            // 对齐到「间隔边界」整点
-            // 例如 interval=60000 时，下次触发恰好在下一个整分钟 :00 秒
-            const interval = config.value.updateIntervalMs
-            const msToNextBoundary = interval - (Date.now() % interval)
-
-            alignTimeout = setTimeout(() => {
-                alignTimeout = null
-                updatePosition()
-                timer = setInterval(updatePosition, interval)
-            }, msToNextBoundary)
+            scheduleNext()
         })
     }
 
@@ -128,14 +128,23 @@ export function useBurnInProtect(
         afterFrames(1, updatePosition)
     }
 
+    // 页面从后台恢复可见时，重新对齐时间
+    function onVisibilityChange() {
+        if (document.visibilityState === 'visible') {
+            startTimer()
+        }
+    }
+
     onMounted(() => {
         startTimer()
         window.addEventListener('resize', onResize)
+        document.addEventListener('visibilitychange', onVisibilityChange)
     })
 
     onUnmounted(() => {
         stopTimer()
         window.removeEventListener('resize', onResize)
+        document.removeEventListener('visibilitychange', onVisibilityChange)
     })
 
     // 防烧屏频率变化：重新对齐边界 + 重新调度
