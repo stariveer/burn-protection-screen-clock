@@ -58,12 +58,25 @@ export function useTimeSync() {
         tickInterval = null
     }
 
+    function onVisibilityChange() {
+        if (document.visibilityState === 'visible') {
+            tick()
+            alignToSecondBoundary()
+        } else {
+            stopTick()
+        }
+    }
+
     onMounted(() => {
         tick()
         alignToSecondBoundary()
+        document.addEventListener('visibilitychange', onVisibilityChange)
     })
 
-    onUnmounted(stopTick)
+    onUnmounted(() => {
+        stopTick()
+        document.removeEventListener('visibilitychange', onVisibilityChange)
+    })
 
     return { timeInfo }
 }

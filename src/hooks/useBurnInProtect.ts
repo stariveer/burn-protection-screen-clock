@@ -104,7 +104,7 @@ export function useBurnInProtect(
 
     function scheduleNext() {
         if (alignTimeout) { clearTimeout(alignTimeout); alignTimeout = null }
-        
+
         const interval = config.value.updateIntervalMs
         const msToNextBoundary = interval - (Date.now() % interval)
 
@@ -128,10 +128,12 @@ export function useBurnInProtect(
         afterFrames(1, updatePosition)
     }
 
-    // 页面从后台恢复可见时，重新对齐时间
+    // 页面从后台恢复可见时，重新调度对齐时间；当页面进入后台时，停止所有定时器节省电量
     function onVisibilityChange() {
         if (document.visibilityState === 'visible') {
             startTimer()
+        } else {
+            stopTimer()
         }
     }
 
