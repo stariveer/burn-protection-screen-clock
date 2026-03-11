@@ -56,7 +56,6 @@
 
   /* ─── 每个数字独立随机倾斜 ─── */
   // 6 个槽：[h0, h1, m0, m1, s0, s1]
-  // 角度范围：-12° ~ +4°，整体向左倾（像斜体），但各自有差异
   function randAngle() {
     return Math.random() * 20 - 10; // -10 ~ +10 deg，随机左右倾
   }
@@ -71,21 +70,48 @@
     },
   );
 
-  // 性能优化：将 style 缓存在 computed 中，避免 Vue 每秒由于 timeInfo 的更改重新在 template 中调用方法生成大量新字面量对象
-  const digitStyles = computed(() => {
+  // 性能优化：拆分为时分样式和秒样式两个 computed
+  // - hmStyles 只在颜色/角度变化时重算（不受每秒 timeInfo 触发）
+  // - sStyles 仅在 showSeconds=true 时才参与计算，关闭秒数时节省计算量
+  const hmStyles = computed(() => {
     const dark = darkGradient.value;
     const light = lightGradient.value;
     const ang = angles.value;
-    
     return [
-      { backgroundImage: dark, transform: `rotate(${ang[0]}deg)` }, // 0: hh[0]
-      { backgroundImage: light, transform: `rotate(${ang[1]}deg)` }, // 1: hh[1]
-      { backgroundImage: dark, transform: `rotate(${ang[2]}deg)` }, // 2: mm[0]
-      { backgroundImage: light, transform: `rotate(${ang[3]}deg)` }, // 3: mm[1]
-      { backgroundImage: dark, transform: `rotate(${ang[4]}deg)` }, // 4: ss[0]
-      { backgroundImage: light, transform: `rotate(${ang[5]}deg)` }, // 5: ss[1]
+      { backgroundImage: dark, transform: `rotate(${ang[0]}deg)` }, // hh[0]
+      { backgroundImage: light, transform: `rotate(${ang[1]}deg)` }, // hh[1]
+      { backgroundImage: dark, transform: `rotate(${ang[2]}deg)` }, // mm[0]
+      { backgroundImage: light, transform: `rotate(${ang[3]}deg)` }, // mm[1]
     ];
   });
+
+  const sStyles = computed(() => {
+    if (!props.config.showSeconds) return null;
+    const dark = darkGradient.value;
+    const light = lightGradient.value;
+    const ang = angles.value;
+    return [
+      { backgroundImage: dark, transform: `rotate(${ang[4]}deg)` }, // ss[0]
+      { backgroundImage: light, transform: `rotate(${ang[5]}deg)` }, // ss[1]
+    ];
+  });
+
+  /* ─── 位移动画期间动态启用 will-change，动画结束后移除以节省 GPU 合成层内存 ─── */
+  const isMoving = ref(false);
+  let moveEndTimer: ReturnType<typeof setTimeout> | null = null;
+
+  watch(
+    () => props.position,
+    () => {
+      isMoving.value = true;
+      if (moveEndTimer) clearTimeout(moveEndTimer);
+      // 1.2s 是 transition 时长，结束后释放合成层
+      moveEndTimer = setTimeout(() => {
+        isMoving.value = false;
+        moveEndTimer = null;
+      }, 1300);
+    },
+  );
 </script>
 
 <template>
@@ -94,42 +120,29 @@
     :style="{
       transform: `translate(${props.position.x}px, ${props.position.y}px)`,
       fontSize: `${props.config.fontSize}vmin`,
+      willChange: isMoving ? 'transform' : 'auto',
     }"
   >
     <!-- 主行：左侧 HH:MM + 右侧辅助列 -->
     <div class="main-row">
       <!-- 左侧：仅时和分 -->
       <div class="clock-time">
-        <span class="digit" :style="digitStyles[0]">{{
-          props.timeInfo.hours[0]
-        }}</span>
-        <span class="digit ol" :style="digitStyles[1]">{{
-          props.timeInfo.hours[1]
-        }}</span>
+        <span class="digit" :style="hmStyles[0]">{{ props.timeInfo.hours[0] }}</span>
+        <span class="digit ol" :style="hmStyles[1]">{{ props.timeInfo.hours[1] }}</span>
 
         <span class="colon">:</span>
 
-        <span class="digit" :style="digitStyles[2]">{{
-          props.timeInfo.minutes[0]
-        }}</span>
-        <span class="digit ol" :style="digitStyles[3]">{{
-          props.timeInfo.minutes[1]
-        }}</span>
+        <span class="digit" :style="hmStyles[2]">{{ props.timeInfo.minutes[0] }}</span>
+        <span class="digit ol" :style="hmStyles[3]">{{ props.timeInfo.minutes[1] }}</span>
       </div>
 
       <!-- 右侧辅助列：顶部日期，底部秒数 -->
       <div class="right-col">
         <!-- 右上：秒数 -->
-        <div v-if="props.config.showSeconds" class="seconds-block">
+        <div v-if="props.config.showSeconds && sStyles" class="seconds-block">
           <span class="colon colon-sm">:</span>
-          <span class="digit digit-sm" :style="digitStyles[4]">{{
-            props.timeInfo.seconds[0]
-          }}</span>
-          <span
-            class="digit digit-sm ol"
-            :style="digitStyles[5]"
-            >{{ props.timeInfo.seconds[1] }}</span
-          >
+          <span class="digit digit-sm" :style="sStyles[0]">{{ props.timeInfo.seconds[0] }}</span>
+          <span class="digit digit-sm ol" :style="sStyles[1]">{{ props.timeInfo.seconds[1] }}</span>
         </div>
 
         <!-- 右下：月日 + 星期 -->
@@ -154,7 +167,7 @@
     transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     -webkit-user-select: none;
-    will-change: transform;
+    /* will-change 由 JS 动态控制（isMoving），仅在位移动画期间启用，平时为 auto 节省 GPU 合成层 */
     white-space: nowrap;
     overflow: visible;
   }
@@ -233,7 +246,7 @@
     font-variant-numeric: tabular-nums;
     transform-origin: center bottom;
     position: relative;
-    transition: transform 1s ease-in-out;
+    transition: transform 0.8s ease-in-out; /* 减少 GPU 持续动画时间 */
   }
 
   /* 第二个数字叠压在第一个上 */

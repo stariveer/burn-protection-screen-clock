@@ -20,7 +20,7 @@ export function useTimeSync() {
         weekday: ''
     })
     const timeInfo = reactive<TimeInfo>(defaultTimeInfo())
-    
+
     let alignTimeout: ReturnType<typeof setTimeout> | null = null
     let tickInterval: ReturnType<typeof setInterval> | null = null
     let lastDay = -1 // 记录上一次的日期日份，用于性能优化，不频繁触发 toLocaleDateString
@@ -31,7 +31,7 @@ export function useTimeSync() {
         const m = now.getMinutes()
         const h = now.getHours()
         const d = now.getDate()
-        
+
         // 性能优化：仅更新变化的值，避免 Vue 产生对象重造引发的深绘制
         timeInfo.seconds = s < 10 ? '0' + s : '' + s
         timeInfo.minutes = m < 10 ? '0' + m : '' + m
@@ -72,6 +72,7 @@ export function useTimeSync() {
 
     function onVisibilityChange() {
         if (document.visibilityState === 'visible') {
+            stopTick() // 先清理旧定时器，避免 race condition 导致双重 setInterval
             tick()
             alignToSecondBoundary()
         } else {
